@@ -25,21 +25,10 @@ import cloudinary.api
 import cloudinary.uploader
 '''
 
-
-
 # Create your views here.
 from django.utils.datetime_safe import datetime
 
-'''for imgur'''
-CLIENT_ID = 'ff5b64065fa26a5'
-CLIENT_SECRET = '4d3de558e74f2537d5b74bba32ebe470bfbad933'
-
-'''API_Key = '564665283213574'
-API_Secret = 'I35M1dR4ztrh8bJoG3OZ0nGEfQ4'
-cloud_name = 'acadview'''
-
-'''for sendgrid'''
-API_KEY = "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"
+# Write your keys and api_secret by defining them here
 
 
 
