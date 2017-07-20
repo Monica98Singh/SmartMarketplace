@@ -4,11 +4,29 @@
     <meta charset="UTF-8">
     <title>Login</title>
 </head>
+<style>
+    body {
+        background-image:url("http://www.agaterismedia.com/wp-content/uploads/2015/05/Hedge-Fund-Marketing.gif");
+           background-size:cover;
+        }
+    label {
+    display:inline-block;
+    width:100px;
+    font-size: 20px;
+    opacity:0.9;
+        }
+        input {
+        padding:10px;
+       font-size:15px;
+       opacity: 0.8;
+       border-radius:10px;
+        }
+</style>
 <body>
-    <div class="main">
+    <div class="main" align="center">
         <h1>Login</h1>
     </div>
-    <div>
+    <div align="center">
         <form method="post">
             {% csrf_token %}
             {{ response_data }}

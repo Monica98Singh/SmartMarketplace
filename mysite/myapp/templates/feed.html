@@ -1,10 +1,74 @@
+{% load staticfiles %}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
 </head>
+<style>
+    body {
+    background-image: url(http://www.macwallhd.com/wp-content/Wallpapers/Abstract/Light%20Mac%20Wallpapers%20HD%20Party%20Decorations-960952414.jpeg);
+
+    }
+
+   .container {
+      width:960px;
+      margin:0 auto;
+      padding:10px 25px;
+      border:1px solid #ccc;
+      background:#fff;
+      }
+
+</style>
 <body>
-     MAKE THE FEEDS PAGE
+    <form method="post" action="/post/" align="center">
+        {% csrf_token %}
+        <input type="submit" class="btn-default btn" value="Create Post">
+    </form>
+
+    <div class="container" align="center" style="background-color:skyblue">
+
+    {% for post in posts %}
+
+
+        <h3> Posted by: {{ post.user.username }} </h3>
+        <p>[{{ post.created_on }}]</p>
+        <img style="display:inline-block; width:350px; height:300px;"
+             src="{{ post.image_url }}" /><br>
+        <span  style="display:inline-block;">{{ post.caption }}</span><br/><br/>
+        <div style="display:inline-block">
+            {{ post.like_count }} likes this
+        </div>
+        <div style="display:inline-block">
+            <form method="POST" action="/like/">
+              {% csrf_token %}
+              <input type="hidden" name="post" value="{{ post.id }}" />
+                {% if post.has_liked %}
+                <input type="submit" class="btn btn-default" value="Unlike">
+                {% else %}
+                <input type="submit" class="btn btn-default" value="Like">
+                {% endif %}
+            </form>
+        </div><br><br>
+
+        <div>
+            <form method="POST" action="/comment/">
+                {% csrf_token %}
+                <input type="hidden" name="post" value="{{ post.id }}" />
+                <input type="text" name="comment_text" id="comment_text" placeholder="Make a comment.." value="{{ comment_text }}">
+                {{ comment_text }}
+                <input type="submit" class="btn-default btn" value="Comment">
+            </form>
+        </div>
+
+        <div>
+            {% for comment in post.comments %}
+                <p><b>{{ comment.user.username }} [{{ comment.created_on }}]:</b> {{ comment.comment_text }}</p>
+            {% endfor %}
+        </div>
+
+    {% endfor %}
+        </div>
 </body>
 </html>

@@ -6,36 +6,79 @@
     <meta charset="UTF-8">
     <title>Smart P2P Marketplace</title>
 </head>
+<style>
+    h1 {
+    display: block;
+    font-size: 50px;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+}
+ h3 {
+    display: block;
+    font-size: 25px;
+    margin-top: 0.67em;
+    margin-bottom: 0.67em;
+    margin-left: 0;
+    margin-right: 0;
+    font-weight: bold;
+
+}
+    body {
+           background-image:url("https://www.code-brew.com/wp-content/uploads/2016/12/marketplace.png");
+           background-size: cover;
+          }
+
+    label{
+    display:inline-block;
+    width:100px;
+    font-size: 20px;
+    opacity:0.9;
+       }
+
+    input{
+       padding:10px;
+       font-size:15px;
+       opacity: 0.8;
+       border-radius:10px;
+       }
+
+
+
+</style>
 <body>
-    <div class="main">
+
+    <div class="main" align="center">
         <h1>Smart P2P MarketPlace</h1>
         <h3>Sign Up</h3>
         <h3>{{today}}</h3>
     </div>
-    <div>
+    <div align="center">
         <form method="post">
             {% csrf_token %}
             <div>
                 <label for="name">Name:</label>
-                <input id="name" type="text" name="name" value={{name}}>
-            </div>
+                <input id="name" type="text" placeholder="Your Name" name="name" value={{name}}>
+            </div><br><br>
             <div>
                 <label for="username">Username:</label>
-                <input id="username" type="text" name="username" value={{username}}>
-            </div>
+                <input id="username" type="text" placeholder="Your UserName" name="username" value={{username}}>
+            </div><br><br>
             <div>
                 <label for="email">Email:</label>
-                <input id="email" type="text" name="email" value={{email}}>
-            </div>
+                <input id="email" type="text" placeholder="Your registered email" name="email" value={{email}}>
+            </div><br><br>
             <div>
                 <label for="password">Password:</label>
-                <input id="password" type="password" name="password" value={{password}}>
-            </div>
+                <input id="password" type="password" placeholder="Your password" name="password" value={{password}}>
+            </div><br><br>
             <input type="submit" value="Sign Up">
         </form>
     </div><br><br>
 
-    <div><h3>Already a User ??</h3><a href="login/">Login</a></div>
+    <div align="center"><h2>Already a User ??</h2><a href="login/"><h3>Login</h3></a></div>
 
 </body>
 </html>
