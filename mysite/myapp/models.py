@@ -9,7 +9,8 @@ from cloudinary.models import CloudinaryField
 
 # Create your models here.
 
-class UserModel(models.Model):
+
+class UserModel(models.Model):  # model for storing details of users in database
     name = models.CharField(max_length=100)
     username = models.CharField(max_length=255)
     email = models.EmailField(max_length=100)
@@ -18,18 +19,18 @@ class UserModel(models.Model):
     updated_on = models.DateTimeField(auto_now=True)
 
 
-class SessionToken(models.Model):
+class SessionToken(models.Model):   # model for creating session for a logged in user
     user = models.ForeignKey(UserModel)
     session_token = models.CharField(max_length=255)
     last_request_on = models.DateTimeField(auto_now=True)
     created_on = models.DateTimeField(auto_now_add=True)
     is_valid = models.BooleanField(default=True)
 
-    def create_token(self):
+    def create_token(self):  # create session token
         self.session_token = uuid.uuid4()
 
 
-class PostModel(models.Model):
+class PostModel(models.Model):  # model for storing details of a post made by user
     user = models.ForeignKey(UserModel)
     image = models.FileField(upload_to='user_images')
     #images = CloudinaryField()
@@ -37,7 +38,9 @@ class PostModel(models.Model):
     caption = models.CharField(max_length=600)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    category = models.CharField(max_length=100, null=True)
     has_liked = False
+
 
     @property
     def like_count(self):
@@ -48,14 +51,14 @@ class PostModel(models.Model):
         return CommentModel.objects.filter(post=self).order_by('-created_on')
 
 
-class LikeModel(models.Model):
+class LikeModel(models.Model):  # model for storing detail when a a post is liked by user
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
 
 
-class CommentModel(models.Model):
+class CommentModel(models.Model):   # model for storing detail when comment is made on a post
     user = models.ForeignKey(UserModel)
     post = models.ForeignKey(PostModel)
     comment_text = models.CharField(max_length=500)

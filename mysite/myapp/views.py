@@ -20,15 +20,26 @@ from imgurpython import ImgurClient
 import sendgrid
 from sendgrid.helpers.mail import *
 
+from clarifai import rest
+from clarifai.rest import ClarifaiApp
+
 '''import cloudinary
 import cloudinary.api
 import cloudinary.uploader
 '''
+import base64
 
 # Create your views here.
 from django.utils.datetime_safe import datetime
 
 # Write your keys and api_secret by defining them here
+
+clarifi_api_key = "cb6df3942f7c4acd912e0208673242e6"
+
+imgur_CLIENT_ID = "ff5b64065fa26a5"
+imgur_CLIENT_SECRET = "4d3de558e74f2537d5b74bba32ebe470bfbad933"
+
+sendgrid_API_KEY = "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"
 
 
 
@@ -95,8 +106,13 @@ def post_view(request):
                 post.save()
 
                 path = os.path.join(BASE_DIR, post.image.url)
+                #result_list = []
+                #length = len(result['outputs'][0]['data']['concepts'])
+                #for x in range(0, length):
+                 #   a = result['outputs'][0]['data']['concepts'][x]['name']
+                  #  result_list = result_list.append(a)
 
-                client = ImgurClient(CLIENT_ID, CLIENT_SECRET)
+                client = ImgurClient(imgur_CLIENT_ID, imgur_CLIENT_SECRET)
                 post.image_url = client.upload_from_path(path, anon=True)['link']
                 post.save()
 
@@ -112,12 +128,30 @@ def post_view(request):
 def feed_view(request):
     user = check_validation(request)
     if user:
-
         posts = PostModel.objects.all().order_by('-created_on')
+        a = PostModel.objects.all()
+
         for post in posts:
-            existing_like = LikeModel.objects.filter(post_id=post.id, user=user).first()
+            existing_like = LikeModel.objects.filter(id=post.id, user=user).first()
             if existing_like:
                 post.has_liked = True
+        #import pdb;pdb.set_trace()
+
+            path = os.path.join(BASE_DIR, post.image.url)
+            if post.image_url:
+                if post.image_url is not None:
+                    app = ClarifaiApp(api_key=clarifi_api_key)
+
+                    # get the general model
+                    model = app.models.get("general-v1.3")
+
+                    # predict with the model
+                    response = model.predict_by_url(url=post.image_url)
+                    post.category = response['outputs'][0]['data']['concepts'][0]['name']
+                    post.save()
+                else:
+                    pass
+
 
         return render(request, 'feed.html', {'posts': posts})
     else:
@@ -125,22 +159,23 @@ def feed_view(request):
         return redirect('/login/')
 
 
-def like_view(request):
-    user = check_validation(request)
+def like_view(request):   # view created for liking a post
+    user = check_validation(request)    # check if user session exists
 
     if user and request.method == 'POST':
         form = Like_form(request.POST)
-        if form.is_valid():
-            post_id = form.cleaned_data.get('post').id
-            a = PostModel.objects.filter(id=post_id)
-            b = a[0].user
-            c = b.email
-            d = user.username
-            e = str(a[0].image)
-            existing_like = LikeModel.objects.filter(post_id=post_id, user=user).first()
+        if form.is_valid(): # check if form is valid or not
+            post_id = form.cleaned_data.get('post').id  # retrieve post id of the post liked
+            a = PostModel.objects.filter(id=post_id)    # get PostModel object with post id of the post which is liked
+            b = a[0].user   # accessing user attribute of PostModel object a
+            c = b.email     # accessing email of the creator of that post which is liked
+            d = user.username   # accessing username of the creator of that post which is liked
+            e = str(a[0].image) # get the name of the image which is liked
+            existing_like = LikeModel.objects.filter(post_id=post_id, user=user).first()    # checking like on the post
             if not existing_like:
-                LikeModel.objects.create(post_id=post_id, user=user)
-                sg = sendgrid.SendGridAPIClient(apikey=API_KEY)
+                LikeModel.objects.create(post_id=post_id, user=user)    # creating like on the post
+                sg = sendgrid.SendGridAPIClient(apikey=sendgrid_API_KEY)     # sending email to creator of post informing
+                                                                    # their post is liked using sendgrid
                 from_email = Email("smartmarketplace@gmail.com")
                 to_email = Email(c)
                 subject = "Liked your post"
@@ -148,27 +183,43 @@ def like_view(request):
                 mail = Mail(from_email, subject, to_email, content)
                 response = sg.client.mail.send.post(request_body=mail.get())
             else:
-                existing_like.delete()
-            return redirect('/feed/')
+                existing_like.delete()  # if like exists delete it then
+            return redirect('/feed/')   # redirect to feeds page after liking or deleting like on a post
     else:
-        return redirect('/login/')
+        return redirect('/login/')  # if user session not exists, redirect to login page
 
 
-def comment_view(request):
-    user = check_validation(request)
+def comment_view(request):  # view for making comment on post
+    user = check_validation(request)    # check if user session exists or not
 
     if user and request.method == 'POST':
         form = Comment_form(request.POST)
-        if form.is_valid():
+        if form.is_valid():     # check if form is valid
             post_id = form.cleaned_data.get('post').id
             comment_text = form.cleaned_data.get('comment_text')
             comment = CommentModel.objects.create(user=user, post_id=post_id, comment_text=comment_text)
-            comment.save()
-            return redirect('/feed/')
+            comment.save()  # comment saved in database
+
+            a = CommentModel.objects.filter(id=post_id)  # get PostModel object with post id of the post which is liked
+            b = a[0].user  # accessing user attribute of CommentModel object a
+            c = b.email  # accessing email of the creator of that post on which comment is made
+            d = user.username  # accessing username of the creator of that post on which comment is made
+            e = str(a[0].comment_text)  # get the comment made on the post
+            f = str(b.image)
+
+            sg = sendgrid.SendGridAPIClient(apikey=sendgrid_API_KEY)  # sending email to creator of post informing
+            # their post is liked using sendgrid
+            from_email = Email("smartmarketplace@gmail.com")
+            to_email = Email(c)
+            subject = "comment on your post"
+            content = Content("text/plain", "The comment " + e + " is made on your post " + f + " on Smart P2P MarketPlace Website by " + d)
+            mail = Mail(from_email, subject, to_email, content)
+            response = sg.client.mail.send.post(request_body=mail.get())
+            return redirect('/feed/')   # user redirected to feeds page after making comment
         else:
-            return redirect('/feed/')
+            return redirect('/feed/')   # if form not valid,redirect user to feed page
     else:
-        return redirect('/login/')
+        return redirect('/login/')  # if user session does not exist, redirected to login page
 
 
 def failure_view(request):
