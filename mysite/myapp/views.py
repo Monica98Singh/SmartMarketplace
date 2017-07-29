@@ -34,12 +34,12 @@ from django.utils.datetime_safe import datetime
 
 # Write your keys and api_secret by defining them here
 
-clarifi_api_key = "cb6df3942f7c4acd912e0208673242e6"
+clarifi_api_key = " "
 
-imgur_CLIENT_ID = "ff5b64065fa26a5"
-imgur_CLIENT_SECRET = "4d3de558e74f2537d5b74bba32ebe470bfbad933"
+imgur_CLIENT_ID = " "
+imgur_CLIENT_SECRET = " "
 
-sendgrid_API_KEY = "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"
+sendgrid_API_KEY = " "
 
 
 
