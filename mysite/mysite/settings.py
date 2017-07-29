@@ -126,8 +126,8 @@ CLOUDINARY_URL = '/cloudinary/'
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 EMAIL_HOST = 'smtp.sendgrid.net'
-EMAIL_HOST_USER = 'MonicaSingh'
-EMAIL_HOST_PASSWORD = 'mon@grid98'
+EMAIL_HOST_USER =' '
+EMAIL_HOST_PASSWORD = ' '
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
